@@ -1,3 +1,4 @@
+
 # frontend.py
 import streamlit as st
 import requests
@@ -7,8 +8,9 @@ import plotly.graph_objects as go
 from datetime import datetime
 import time
 
-#Config
-API_BASE_URL = "https://ai-stock-analyst-production.up.railway.app"  
+# Configuration
+#API_BASE_URL = "http://localhost:8000"  # Change to your deployed backend URL
+API_BASE_URL = "https://ai-stock-analyst-production.up.railway.app" 
 
 # Page configuration
 st.set_page_config(
@@ -191,35 +193,45 @@ def get_weather_data():
     return {"error": "Weather data unavailable"}
 
 def show_live_clock():
-    """Show live clock and date in sidebar"""
-    import time
+    """Show current time and date in sidebar"""
+    st.markdown("### 🕐 Current Time")
     
     # Get current time
     current_time = datetime.now()
     
-    st.markdown("### 🕐 Live Clock")
+    # Create the clock display
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        margin: 1rem 0;
+    ">
+        <h3 style="margin: 0; font-size: 1.8rem;">{current_time.strftime('%H:%M:%S')}</h3>
+        <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem;">{current_time.strftime('%A')}</p>
+        <p style="margin: 0; font-size: 1rem;">{current_time.strftime('%B %d, %Y')}</p>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.8;">
+            Updates with app interactions
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Add this function for better user experience
+def auto_refresh_app():
+    """Add subtle auto-refresh functionality"""
+    # Only refresh if no user activity for a while
+    if 'last_interaction' not in st.session_state:
+        st.session_state.last_interaction = time.time()
     
-    # Create a placeholder for the clock
-    clock_placeholder = st.empty()
-    
-    # Display current time and date
-    with clock_placeholder.container():
-        st.markdown(f"""
-        <div style="
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 1.5rem;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-            margin: 1rem 0;
-        ">
-            <h3 style="margin: 0; font-size: 1.8rem;">{current_time.strftime('%H:%M:%S')}</h3>
-            <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem;">{current_time.strftime('%A')}</p>
-            <p style="margin: 0; font-size: 1rem;">{current_time.strftime('%B %d, %Y')}</p>
-            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.8;">
-                {current_time.strftime('%Z')} Time
-            </p>
-        </div>
+    # Light auto-refresh every 60 seconds when idle
+    current_time = time.time()
+    if current_time - st.session_state.last_interaction > 60:
+        st.session_state.last_interaction = current_time
+        # Minimal JavaScript refresh
+        st.markdown("""
+        <meta http-equiv="refresh" content="60">
         """, unsafe_allow_html=True)
 
 def analyze_stock(symbol):
@@ -524,6 +536,9 @@ def show_stock_analysis(analysis_data):
 # Main application
 def show_main_app():
     """Show main application interface"""
+    # Add subtle auto-refresh
+    auto_refresh_app()
+    
     # Sidebar
     with st.sidebar:
         st.markdown(f"### 👋 Welcome, {st.session_state.user['full_name']}!")
