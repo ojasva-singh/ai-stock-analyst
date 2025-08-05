@@ -8,7 +8,7 @@ import time
 
 # Configuration
 #API_BASE_URL = "http://localhost:8000"  # Change to your deployed backend URL
-API_BASE_URL = "https://ai-stock-analyst-production.up.railway.app" 
+API_BASE_URL = "https://ai-stock-analyst-hxdf.onrender.com"
 
 # Page configuration
 st.set_page_config(
