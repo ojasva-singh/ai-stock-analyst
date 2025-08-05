@@ -7,8 +7,8 @@ import plotly.graph_objects as go
 from datetime import datetime
 import time
 
-# Configuration
-API_BASE_URL = "http://localhost:8000"  
+#Config
+API_BASE_URL = "https://ai-stock-analyst-production.up.railway.app"  
 
 # Page configuration
 st.set_page_config(
