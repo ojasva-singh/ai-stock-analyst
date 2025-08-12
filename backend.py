@@ -146,13 +146,13 @@ async def get_stock_data(symbol: str) -> Dict:
         if hist.empty:
             raise HTTPException(status_code=400, detail=f"No data found for symbol {symbol}")
         
-        # Get financial data (safely)
-        try:
-            financials = stock.financials
-            balance_sheet = stock.balance_sheet
-        except:
-            financials = None
-            balance_sheet = None
+        # # Get financial data (safely)
+        # try:
+        #     financials = stock.financials
+        #     balance_sheet = stock.balance_sheet
+        # except:
+        #     financials = None
+        #     balance_sheet = None
         
         # Calculate technical indicators (with safe conversion)
         current_price = float(hist['Close'].iloc[-1]) if len(hist) > 0 else 0.0
@@ -249,7 +249,7 @@ async def generate_swot_analysis(stock_data: Dict) -> Dict:
         - Market Cap: ${stock_data['market_cap']:,}
         - Current Performance: {stock_data['price_change_pct']:.2f}% change
         
-        Provide a structured SWOT analysis with exactly 4-5 points each:
+        Provide a structured SWOT analysis with exactly 4 points each:
         
         Return ONLY a valid JSON object with this exact format:
         {{
@@ -348,7 +348,7 @@ async def get_real_time_stock_info(symbol: str, query: str) -> str:
             
             # Enhanced search query for better results
             search_queries = [
-                f"{symbol} stock {query} latest news 2024",
+                f"{symbol} stock {query} latest news 2025",
                 f"{symbol} earnings financial results recent",
                 f"{symbol} stock price target analyst recommendations"
             ]
@@ -623,59 +623,59 @@ def create_stock_chart(stock_data: Dict) -> str:
         print(f"Chart creation error: {str(e)}")
         return ""
 
-def generate_pdf_report(stock_data: Dict, analysis: str, swot: Dict) -> str:
-    """Generate PDF report and return base64 encoded"""
-    try:
-        buffer = BytesIO()
-        p = canvas.Canvas(buffer, pagesize=letter)
+# def generate_pdf_report(stock_data: Dict, analysis: str, swot: Dict) -> str:
+#     """Generate PDF report and return base64 encoded"""
+#     try:
+#         buffer = BytesIO()
+#         p = canvas.Canvas(buffer, pagesize=letter)
         
-        # Title
-        p.setFont("Helvetica-Bold", 16)
-        p.drawString(50, 750, f"Stock Analysis Report: {stock_data['company_name']}")
+#         # Title
+#         p.setFont("Helvetica-Bold", 16)
+#         p.drawString(50, 750, f"Stock Analysis Report: {stock_data['company_name']}")
         
-        # Basic info
-        p.setFont("Helvetica", 12)
-        y_position = 720
+#         # Basic info
+#         p.setFont("Helvetica", 12)
+#         y_position = 720
         
-        info_lines = [
-            f"Symbol: {stock_data['symbol']}",
-            f"Current Price: ${stock_data['current_price']:.2f}",
-            f"Price Change: {stock_data['price_change_pct']:.2f}%",
-            f"Market Cap: ${stock_data['market_cap']:,}",
-            f"Sector: {stock_data['sector']}",
-            f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        ]
+#         info_lines = [
+#             f"Symbol: {stock_data['symbol']}",
+#             f"Current Price: ${stock_data['current_price']:.2f}",
+#             f"Price Change: {stock_data['price_change_pct']:.2f}%",
+#             f"Market Cap: ${stock_data['market_cap']:,}",
+#             f"Sector: {stock_data['sector']}",
+#             f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+#         ]
         
-        for line in info_lines:
-            p.drawString(50, y_position, line)
-            y_position -= 20
+#         for line in info_lines:
+#             p.drawString(50, y_position, line)
+#             y_position -= 20
         
-        # Analysis section
-        y_position -= 20
-        p.setFont("Helvetica-Bold", 14)
-        p.drawString(50, y_position, "Analysis Summary:")
+#         # Analysis section
+#         y_position -= 20
+#         p.setFont("Helvetica-Bold", 14)
+#         p.drawString(50, y_position, "Analysis Summary:")
         
-        y_position -= 20
-        p.setFont("Helvetica", 10)
+#         y_position -= 20
+#         p.setFont("Helvetica", 10)
         
-        # Split analysis into lines
-        analysis_lines = analysis[:1000].split('\n')  # Limit for PDF
-        for line in analysis_lines[:20]:  # First 20 lines
-            if y_position < 100:
-                p.showPage()
-                y_position = 750
-            p.drawString(50, y_position, line[:80])  # Limit line length
-            y_position -= 15
+#         # Split analysis into lines
+#         analysis_lines = analysis[:1000].split('\n')  # Limit for PDF
+#         for line in analysis_lines[:20]:  # First 20 lines
+#             if y_position < 100:
+#                 p.showPage()
+#                 y_position = 750
+#             p.drawString(50, y_position, line[:80])  # Limit line length
+#             y_position -= 15
         
-        p.save()
-        buffer.seek(0)
-        pdf_base64 = base64.b64encode(buffer.getvalue()).decode()
-        buffer.close()
+#         p.save()
+#         buffer.seek(0)
+#         pdf_base64 = base64.b64encode(buffer.getvalue()).decode()
+#         buffer.close()
         
-        return pdf_base64
+#         return pdf_base64
         
-    except Exception as e:
-        return ""
+#     except Exception as e:
+#         return ""
 
 # API Routes
 
@@ -834,8 +834,8 @@ async def analyze_stock(query: StockQuery, current_user: Dict = Depends(get_curr
         print("Chart created successfully")
         
         # Generate PDF report
-        pdf_b64 = generate_pdf_report(stock_data, analysis, swot)
-        print("PDF report generated successfully")
+        # pdf_b64 = generate_pdf_report(stock_data, analysis, swot)
+        # print("PDF report generated successfully")
         
         # Save to chat history
         try:
@@ -858,8 +858,8 @@ async def analyze_stock(query: StockQuery, current_user: Dict = Depends(get_curr
             "analysis": analysis,
             "swot_analysis": swot,
             "suggested_stocks": suggested_stocks,
-            "chart": chart_b64,
-            "pdf_report": pdf_b64
+            "chart": chart_b64
+            #"pdf_report": pdf_b64
         }
         
     except HTTPException:
@@ -868,27 +868,27 @@ async def analyze_stock(query: StockQuery, current_user: Dict = Depends(get_curr
         print(f"Error in analyze_stock: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
-@app.get("/chat-history")
-async def get_chat_history(current_user: Dict = Depends(get_current_user)):
-    """Get user's chat history"""
-    try:
-        result = supabase.table('chat_history').select("*").eq('user_id', current_user["user_id"]).order('created_at', desc=True).limit(50).execute()
+# @app.get("/chat-history")
+# async def get_chat_history(current_user: Dict = Depends(get_current_user)):
+#     """Get user's chat history"""
+#     try:
+#         result = supabase.table('chat_history').select("*").eq('user_id', current_user["user_id"]).order('created_at', desc=True).limit(50).execute()
         
-        return {"chat_history": result.data}
+#         return {"chat_history": result.data}
         
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
-@app.delete("/chat-history/{chat_id}")
-async def delete_chat(chat_id: str, current_user: Dict = Depends(get_current_user)):
-    """Delete a chat from history"""
-    try:
-        result = supabase.table('chat_history').delete().eq('id', chat_id).eq('user_id', current_user["user_id"]).execute()
+# @app.delete("/chat-history/{chat_id}")
+# async def delete_chat(chat_id: str, current_user: Dict = Depends(get_current_user)):
+#     """Delete a chat from history"""
+#     try:
+#         result = supabase.table('chat_history').delete().eq('id', chat_id).eq('user_id', current_user["user_id"]).execute()
         
-        return {"message": "Chat deleted successfully"}
+#         return {"message": "Chat deleted successfully"}
         
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+#     except Exception as e:
+#         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/ask-question")
 async def ask_stock_question(question_data: StockQuestion, current_user: Dict = Depends(get_current_user)):
